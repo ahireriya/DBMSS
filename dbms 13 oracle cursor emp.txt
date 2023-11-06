@@ -1,0 +1,64 @@
+CREATE TABLE Employee (
+  Emp_id NUMBER,
+  Emp_Name VARCHAR2(100),
+  Salary NUMBER
+);
+DROP TABLE Employee;
+
+INSERT INTO Employee VALUES (1, 'John Doe', 60000);
+INSERT INTO Employee VALUES (2, 'Jane Smith', 70000);
+INSERT INTO Employee VALUES (3, 'Bob Johnson', 45000);
+INSERT INTO Employee VALUES (4, 'Alice Brown', 80000);
+COMMIT;
+
+// explicit 
+ SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE display_high_salary_employees IS
+  CURSOR emp_cursor IS
+    SELECT Emp_id, Emp_Name, Salary
+    FROM Employee
+    WHERE Salary > 50000;
+BEGIN
+  FOR emp_rec IN emp_cursor LOOP
+    DBMS_OUTPUT.PUT_LINE('Employee ID: ' || emp_rec.Emp_id || ', Name: ' || emp_rec.Emp_Name || ', Salary: ' || emp_rec.Salary);
+  END LOOP;
+END;
+BEGIN
+  display_high_salary_employees;
+END;
+/
+
+//  implicit 
+DECLARE
+  total_records NUMBER;
+BEGIN
+  SELECT COUNT(*) INTO total_records FROM Employee;
+  DBMS_OUTPUT.PUT_LINE('Total number of records: ' || total_records);
+END;
+
+//Parameterized Cursor 
+ SET SERVEROUTPUT ON;
+CREATE OR REPLACE PROCEDURE get_employee_salary (p_emp_id IN NUMBER) IS
+  v_salary Employee.Salary%TYPE;
+BEGIN
+  SELECT Salary INTO v_salary
+  FROM Employee
+  WHERE Emp_id = p_emp_id;
+  
+  IF v_salary IS NULL THEN
+    DBMS_OUTPUT.PUT_LINE('Employee with ID ' || p_emp_id || ' not found');
+  ELSE
+    DBMS_OUTPUT.PUT_LINE('Salary of Employee ' || p_emp_id || ': ' || v_salary);
+  END IF;
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('Employee with ID ' || p_emp_id || ' not found');
+END;
+
+
+
+BEGIN
+  get_employee_salary(1); -- Replace 1 with the desired employee ID
+END;
+/

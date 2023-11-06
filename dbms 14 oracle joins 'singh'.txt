@@ -1,0 +1,83 @@
+-- Create Employee table
+CREATE TABLE Employee (
+    Employee_id NUMBER PRIMARY KEY,
+    First_name VARCHAR2(50),
+    last_name VARCHAR2(50),
+    hire_date DATE,
+    salary NUMBER,
+    Job_title VARCHAR2(50),
+    manager_id NUMBER,
+    department_id NUMBER,
+    FOREIGN KEY (manager_id) REFERENCES Employee(Employee_id),
+    FOREIGN KEY (department_id) REFERENCES Departments(Department_id)
+);
+
+-- Create Departments table
+CREATE TABLE Departments (
+    Department_id NUMBER PRIMARY KEY,
+    Department_name VARCHAR2(50),
+    Manager_id NUMBER,
+    Location_id NUMBER,
+    FOREIGN KEY (Manager_id) REFERENCES Manager(Manager_id),
+    FOREIGN KEY (Location_id) REFERENCES Locations(Location_id)
+);
+
+-- Create Locations table
+CREATE TABLE Locations (
+    Location_id NUMBER PRIMARY KEY,
+    street_address VARCHAR2(100),
+    postal_code VARCHAR2(20),
+    city VARCHAR2(50),
+    state VARCHAR2(50),
+    country_id VARCHAR2(2)
+);
+
+-- Create Manager table
+CREATE TABLE Manager (
+    Manager_id NUMBER PRIMARY KEY,
+    Manager_name VARCHAR2(50)
+);
+
+-- Insert data into Employee table
+INSERT INTO Employee VALUES (1, 'John', 'Doe', TO_DATE('2023-01-10', 'YYYY-MM-DD'), 50000, 'Manager', NULL, 1);
+INSERT INTO Employee VALUES (2, 'Jane', 'Smith', TO_DATE('2023-02-15', 'YYYY-MM-DD'), 45000, 'Employee', 1, 1);
+-- Add more employee data as needed
+
+-- Insert data into Departments table
+INSERT INTO Departments VALUES (1, 'IT', 1, 1);
+-- Add more department data as needed
+
+-- Insert data into Locations table
+INSERT INTO Locations VALUES (1, '123 Main St', '12345', 'New York', 'NY', 'US');
+-- Add more location data as needed
+
+-- Insert data into Manager table
+INSERT INTO Manager VALUES (1, 'Manager Name 1');
+-- Add more manager data as needed
+
+
+SELECT First_name, last_name, salary
+FROM Employee
+WHERE salary > (SELECT salary FROM Employee WHERE last_name = 'Singh');
+
+
+SELECT E.First_name, E.last_name
+FROM Employee E
+JOIN Departments D ON E.department_id = D.Department_id
+JOIN Locations L ON D.Location_id = L.Location_id
+WHERE E.manager_id IS NOT NULL AND L.country_id = 'US';
+
+
+SELECT First_name, last_name, salary
+FROM Employee
+WHERE salary > (SELECT AVG(salary) FROM Employee);
+
+
+SELECT E.Employee_id, E.last_name, E.manager_id, M.Manager_name
+FROM Employee E
+LEFT JOIN Manager M ON E.manager_id = M.Manager_id;
+
+
+SELECT First_name, last_name, hire_date
+FROM Employee
+WHERE hire_date > (SELECT hire_date FROM Employee WHERE last_name = 'Jones');

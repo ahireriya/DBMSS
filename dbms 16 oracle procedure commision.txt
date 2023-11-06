@@ -1,0 +1,87 @@
+----Employee( emp_id, dept_idemp_name, DoJ, salary, commission,job_title)
+1. Consider the schema given above. Keep the commission column empty initially. Write a Stored Procedure to
+record the employee commission based on following conditions. If salary is more than 10000 then commission
+is 0.4%, if Salary is less than 10000 but experience is more than 10 years then 0.35%, if salary is less than 3000
+then commission is 0.25%. In the remaining cases commission is 0.15%.
+2. Write a PLSQL Function that takes department ID and returns the name of the manager of the department.
+
+
+
+CREATE TABLE Employee1 (
+  emp_id INT PRIMARY KEY,
+  dept_id INT,
+  emp_name VARCHAR(30),
+  DoJ DATE,
+  salary NUMBER,
+  commission NUMBER,
+  job_title VARCHAR(30)
+);
+
+-- Insert sample data into the Employee1 table
+INSERT INTO Employee1 (emp_id, dept_id, emp_name, DoJ, salary, commission, job_title)
+VALUES (1, 101, 'John Doe', TO_DATE('2023-01-15', 'YYYY-MM-DD'), 50000, 2000, 'Manager');
+INSERT INTO Employee1 (emp_id, dept_id, emp_name, DoJ, salary, commission, job_title)
+VALUES (2, 102, 'Jane Smith', TO_DATE('2023-02-20', 'YYYY-MM-DD'), 45000, 1500, 'Developer');
+INSERT INTO Employee1 (emp_id, dept_id, emp_name, DoJ, salary, commission, job_title)
+VALUES (3, 103, 'Bob Johnson', TO_DATE('2023-03-10', 'YYYY-MM-DD'), 60000, 2500, 'Analyst');
+
+SELECT * FROM Employee1;
+
+CREATE OR REPLACE PROCEDURE RecordEmployeeCommission(emp_id IN NUMBER) IS
+  v_salary NUMBER;
+  v_experience NUMBER;
+  v_commission_percentage NUMBER;
+BEGIN
+  -- Get the salary and experience for the given emp_id
+  SELECT salary, (SYSDATE - DoJ) / 365 INTO v_salary, v_experience FROM Employee WHERE emp_id = emp_id;
+  
+  -- Calculate commission percentage based on salary and experience
+  IF v_salary > 10000 THEN
+    v_commission_percentage := 0.004;
+  ELSIF v_salary <= 10000 AND v_experience > 3650 THEN -- 10 years in days
+    v_commission_percentage := 0.0035;
+  ELSIF v_salary < 3000 THEN
+    v_commission_percentage := 0.0025;
+  ELSE
+    v_commission_percentage := 0.0015;
+  END IF;
+  
+  -- Update the commission for the employee
+  UPDATE Employee
+  SET commission = v_salary * v_commission_percentage
+  WHERE emp_id = emp_id;
+  
+  COMMIT;
+  
+  DBMS_OUTPUT.PUT_LINE('Commission recorded for employee ' || emp_id || ': ' || v_salary * v_commission_percentage);
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('Employee with emp_id ' || emp_id || ' not found.');
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+
+
+  
+
+BEGIN
+  RecordEmployeeCommission(1); -- Replace 1 with the desired emp_id
+END;
+
+
+*******************************************************************************************************************************************************************************************************
+CREATE OR REPLACE FUNCTION manager(t_dept_id IN Employee1.dept_id%TYPE)
+RETURN VARCHAR
+IS
+    manager_name VARCHAR(30);
+BEGIN
+    SELECT emp_name INTO manager_name FROM Employee1 WHERE dept_id=t_dept_id AND job_title='Manager';
+    RETURN manager_name;
+END;
+
+DECLARE
+    manager_name Employee1.emp_name%TYPE;
+BEGIN
+    manager_name := manager(101);
+    DBMS_OUTPUT.PUT_LINE('Manager Name : ' || manager_name);
+END;

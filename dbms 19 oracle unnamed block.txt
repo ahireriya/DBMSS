@@ -1,0 +1,57 @@
+CREATE TABLE Employee (
+  emp_id NUMBER,
+  dept_id NUMBER,
+  emp_name VARCHAR2(100),
+  DoJ DATE,
+  salary NUMBER,
+  commission NUMBER,
+  job_title VARCHAR2(100)
+);
+DROP TABLE Employee;
+CREATE TABLE Salary_Increment (
+  emp_id NUMBER,
+  new_salary NUMBER
+);
+-- Insert some sample employees
+INSERT INTO Employee VALUES (115, 1, 'John Doe', TO_DATE('01-01-2005', 'DD-MM-YYYY'), 60000, NULL, 'Manager');
+INSERT INTO Employee VALUES (116, 2, 'Jane Smith', TO_DATE('01-01-2012', 'DD-MM-YYYY'), 70000, NULL, 'Supervisor');
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+  v_emp_id Employee.emp_id%TYPE := 115;
+  v_experience NUMBER;
+  v_increment_factor NUMBER;
+  v_new_salary NUMBER;
+BEGIN
+  -- Calculate years of experience
+  SELECT ROUND(MONTHS_BETWEEN(SYSDATE, DoJ) / 12) INTO v_experience
+  FROM Employee
+  WHERE emp_id = v_emp_id;
+  
+  -- Determine increment factor
+  IF v_experience > 10 THEN
+    v_increment_factor := 1.2;
+  ELSIF v_experience > 5 THEN
+    v_increment_factor := 1.1;
+  ELSE
+    v_increment_factor := 1.05;
+  END IF;
+  
+  -- Calculate new salary
+  SELECT salary * v_increment_factor INTO v_new_salary
+  FROM Employee
+  WHERE emp_id = v_emp_id;
+  
+  -- Insert into Salary_Increment table
+  INSERT INTO Salary_Increment VALUES (v_emp_id, v_new_salary);
+  
+  -- Display the updated salary
+  DBMS_OUTPUT.PUT_LINE('Employee ID: ' || v_emp_id || ', New Salary: ' || v_new_salary);
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('Employee with ID ' || v_emp_id || ' not found');
+  WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/

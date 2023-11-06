@@ -1,0 +1,111 @@
+-- Create Customer table
+CREATE TABLE Customer (
+    CustID INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Cust_Address VARCHAR(100),
+    Phone_no VARCHAR(15),
+    Email_ID VARCHAR(50),
+    Age INT
+);
+
+-- Create Branch table
+CREATE TABLE Branch (
+    Branch_ID INT PRIMARY KEY,
+    Branch_Name VARCHAR(50),
+    Address VARCHAR(100)
+);
+
+-- Create Account table
+CREATE TABLE Account (
+    Account_no INT PRIMARY KEY,
+    Branch_ID INT,
+    CustID INT,
+    open_date DATE,
+    Account_type VARCHAR(20),
+    Balance DECIMAL(10, 2),
+    FOREIGN KEY (Branch_ID) REFERENCES Branch(Branch_ID),
+    FOREIGN KEY (CustID) REFERENCES Customer(CustID)
+);
+
+-- Insert data into Customer table
+INSERT INTO Customer (CustID, Name, Cust_Address, Phone_no, Email_ID, Age)
+VALUES (101, 'John Doe', '123 Main St', '555-1234', 'john.doe@example.com', 30);
+
+INSERT INTO Customer (CustID, Name, Cust_Address, Phone_no, Email_ID, Age)
+VALUES (102, 'Jane Smith', '456 Oak St', '555-5678', 'jane.smith@example.com', 25);
+
+INSERT INTO Customer (CustID, Name, Cust_Address, Phone_no, Email_ID, Age)
+VALUES (103, 'Bob Johnson', '789 Pine St', '555-9876', 'bob.johnson@example.com', 35);
+
+-- Insert data into Branch table
+INSERT INTO Branch (Branch_ID, Branch_Name, Address)
+VALUES (1, 'Downtown', '100 Main St');
+
+INSERT INTO Branch (Branch_ID, Branch_Name, Address)
+VALUES (2, 'Uptown', '200 Oak St');
+
+-- Insert data into Account table
+INSERT INTO Account (Account_no, Branch_ID, CustID, open_date, Account_type, Balance)
+VALUES (1001, 1, 101, TO_DATE('2018-08-16', 'YYYY-MM-DD'), 'Saving', 1000.00);
+
+INSERT INTO Account (Account_no, Branch_ID, CustID, open_date, Account_type, Balance)
+VALUES (1002, 2, 102, TO_DATE('2018-08-16', 'YYYY-MM-DD'), 'Loan', 5000.00);
+
+INSERT INTO Account (Account_no, Branch_ID, CustID, open_date, Account_type, Balance)
+VALUES (1003, 1, 103, TO_DATE('2018-02-16', 'YYYY-MM-DD'), 'Saving', 2000.00);
+
+
+-- Task 1: Create tables with referential integrity
+CREATE TABLE Customer (
+    CustID INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Cust_Address VARCHAR(100),
+    Phone_no VARCHAR(15),
+    Email_ID VARCHAR(50),
+    Age INT
+);
+
+CREATE TABLE Branch (
+    Branch_ID INT PRIMARY KEY,
+    Branch_Name VARCHAR(50),
+    Address VARCHAR(100)
+);
+
+CREATE TABLE Account (
+    Account_no INT PRIMARY KEY,
+    Branch_ID INT,
+    CustID INT,
+    open_date DATE,
+    Account_type VARCHAR(20),
+    Balance DECIMAL(10, 2),
+    FOREIGN KEY (Branch_ID) REFERENCES Branch(Branch_ID),
+    FOREIGN KEY (CustID) REFERENCES Customer(CustID)
+);
+
+-- Task 2: ER Diagram
+-- Unfortunately, I can't draw diagrams. You can use a diagram tool or draw it on paper.
+
+-- Task 3: Create a view for Saving account with open date as 16/8/2018
+CREATE VIEW Saving_Accounts AS
+SELECT C.*, A.open_date
+FROM Customer C
+JOIN Account A ON C.CustID = A.CustID
+WHERE A.Account_type = 'Saving' AND A.open_date = TO_DATE('2018-08-16', 'YYYY-MM-DD');
+
+-- Task 4: Update the view with Cust_Address as Pune for CustID = 103
+UPDATE Saving_Accounts
+SET Cust_Address = 'Pune'
+WHERE CustID = 103;
+
+-- Task 5: Create a view for Loan account with open date as 16/2/2018
+CREATE VIEW Loan_Accounts AS
+SELECT C.*, A.open_date
+FROM Customer C
+JOIN Account A ON C.CustID = A.CustID
+WHERE A.Account_type = 'Loan' AND A.open_date = TO_DATE('2018-02-16', 'YYYY-MM-DD');
+
+-- Task 6: Create an index on primary key column of table Customer
+CREATE INDEX idx_Customer_CustID ON Customer (CustID);
+
+-- Task 7: Create an index on primary key column of table Branch
+CREATE INDEX idx_Branch_BranchID ON Branch (Branch_ID

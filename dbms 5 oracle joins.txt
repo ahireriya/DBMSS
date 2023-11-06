@@ -1,0 +1,95 @@
+-- Create Employee table
+DROP TABLE Employee;
+CREATE TABLE Employee (
+    Employee_id INT PRIMARY KEY,
+    First_name VARCHAR(255),
+    Last_name VARCHAR(255),
+    Hire_date DATE,
+    Salary DECIMAL(10, 2),
+    Job_title VARCHAR(255),
+    Manager_id INT,
+    Department_id INT,
+    FOREIGN KEY (Manager_id) REFERENCES Manager(Manager_id),
+    FOREIGN KEY (Department_id) REFERENCES Departments(Department_id)
+);
+
+-- Create Departments table
+CREATE TABLE Departments (
+    Department_id INT PRIMARY KEY,
+    Department_name VARCHAR(255),
+    Manager_id INT,
+    Location_id INT,
+    FOREIGN KEY (Manager_id) REFERENCES Manager(Manager_id),
+    FOREIGN KEY (Location_id) REFERENCES Locations(Location_id)
+);
+
+-- Create Locations table
+CREATE TABLE Locations (
+    Location_id INT PRIMARY KEY,
+    Street_address VARCHAR(255),
+    Postal_code VARCHAR(20),
+    City VARCHAR(255),
+    State VARCHAR(255),
+    Country_id INT
+);
+
+-- Create Manager table
+CREATE TABLE Manager (
+    Manager_id INT PRIMARY KEY,
+    Manager_name VARCHAR(255)
+);
+
+-- Insert data into Manager table for Oracle
+INSERT INTO Manager (Manager_id, Manager_name) VALUES (1, 'John Doe');
+INSERT INTO Manager (Manager_id, Manager_name) VALUES (2, 'Jane Smith');
+INSERT INTO Manager (Manager_id, Manager_name) VALUES (3, 'Michael Scott');
+
+-- Insert data into Locations table for Oracle
+INSERT INTO Locations (Location_id, Street_address, Postal_code, City, State, Country_id) VALUES (1, '789 Elm St', '54321', 'Chicago', 'IL', 1);
+INSERT INTO Locations (Location_id, Street_address, Postal_code, City, State, Country_id) VALUES (2, '101 Pine Ave', '98765', 'San Francisco', 'CA', 1);
+
+-- Insert data into Departments table for Oracle
+INSERT INTO Departments (Department_id, Department_name, Manager_id, Location_id) VALUES (1, 'IT', 3, 1);
+INSERT INTO Departments (Department_id, Department_name, Manager_id, Location_id) VALUES (2, 'Finance', 2, 1);
+INSERT INTO Departments (Department_id, Department_name, Manager_id, Location_id) VALUES (3, 'Operations', 1, 2);
+
+-- Insert data into Employee table for Oracle
+INSERT INTO Employee (Employee_id, First_name, Last_name, Hire_date, Salary, Job_title, Manager_id, department_id) VALUES (1, 'Sarah', 'Johnson', TO_DATE('2019-02-20', 'YYYY-MM-DD'), 75000, 'Developer', 3, 1);
+INSERT INTO Employee (Employee_id, First_name, Last_name, Hire_date, Salary, Job_title, Manager_id, department_id) VALUES (2, 'Mark', 'Davis', TO_DATE('2018-09-15', 'YYYY-MM-DD'), 65000, 'Tester', 3, 1);
+INSERT INTO Employee (Employee_id, First_name, Last_name, Hire_date, Salary, Job_title, Manager_id, department_id) VALUES (3, 'Ella', 'Wilson', TO_DATE('2020-05-10', 'YYYY-MM-DD'), 80000, 'Manager', 1, 2);
+INSERT INTO Employee (Employee_id, First_name, Last_name, Hire_date, Salary, Job_title, Manager_id, department_id) VALUES (4, 'David', 'Brown', TO_DATE('2017-11-28', 'YYYY-MM-DD'), 95000, 'Manager', 2, 3);
+INSERT INTO Employee (Employee_id, First_name, Last_name, Hire_date, Salary, Job_title, Manager_id, department_id) VALUES (5, 'Lisa', 'Smith', TO_DATE('2016-08-03', 'YYYY-MM-DD'), 105000, 'Director', NULL, 3);
+
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+JOIN Departments d ON e.department_id = d.Department_id
+WHERE e.salary > (SELECT AVG(salary) FROM Employee) AND d.Department_name = 'IT';
+
+SELECT e.first_name, e.last_name, e.salary
+FROM Employee e
+WHERE e.salary = (SELECT MIN(salary) FROM Employee);
+
+SELECT e.Employee_id, e.first_name, e.last_name, e.salary
+FROM Employee e
+JOIN (
+    SELECT department_id, AVG(salary) AS avg_salary
+    FROM Employee
+    GROUP BY department_id
+) avg_sal ON e.department_id = avg_sal.department_id
+WHERE e.salary > avg_sal.avg_salary;
+
+SELECT d.Department_name, m.Manager_name, l.city
+FROM Departments d
+JOIN Manager m ON d.Manager_id = m.Manager_id
+JOIN Locations l ON d.Location_id = l.Location_id;
+
+SELECT e.first_name, e.last_name, e.Hire_date, e.salary
+FROM Employee e
+JOIN Manager m ON e.Employee_id = m.Manager_id
+WHERE MONTHS_BETWEEN(sysdate, e.Hire_date)/12 > 15;
+
+
+
+
+
+
