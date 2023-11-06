@@ -1,0 +1,79 @@
+***Create the "Student" collection and insert 10 documents:
+
+// Create the Student collection
+db.createCollection("Student")
+
+// Insert 10 documents into the Student collection
+db.Student.insertMany([
+  {
+    Roll_No: "A1",
+    Name: "Alice",
+    Class: "SE",
+    Marks: 60,
+    Address: "123 Main St",
+    Enrolled_Courses: ["DBMS", "TOC"]
+  },
+  {
+    Roll_No: "A2",
+    Name: "Bob",
+    Class: "TE",
+    Marks: 45,
+    Address: "456 Elm St",
+    Enrolled_Courses: ["TOC"]
+  },
+  {
+    Roll_No: "A3",
+    Name: "Charlie",
+    Class: "SE",
+    Marks: 70,
+    Address: "789 Oak St",
+    Enrolled_Courses: ["DBMS"]
+  },
+  // Insert 7 more documents with similar structure
+]);
+
+***List the names of students who have enrolled in the courses "DBMS" or "TOC":
+
+db.Student.find({ Enrolled_Courses: { $in: ["DBMS", "TOC"] }, }, { Name: 1, _id: 0 });
+List the Roll numbers and class of students who have marks more than 50 or belong to class "TE":
+javascript
+Copy code
+db.Student.find(
+  {
+    $or: [
+      { Marks: { $gt: 50 } },
+      { Class: "TE" }
+    ]
+  },
+  { Roll_No: 1, Class: 1, _id: 0 }
+);
+
+***Update the entire record of Roll_No "A10" (assuming you meant to update "A1" since there is no "A10" in the provided documents):
+
+db.Student.updateOne(
+  { Roll_No: "A1" },
+  {
+    $set: {
+      Name: "UpdatedName",
+      Class: "UpdatedClass",
+      Marks: 90,
+      Address: "UpdatedAddress",
+      Enrolled_Courses: ["UpdatedCourse1", "UpdatedCourse2"]
+    }
+  }
+);
+
+***Display the names of students having the 3rd and 4th highest marks:
+
+db.Student.find({}, { Name: 1, Marks: 1, _id: 0 })
+  .sort({ Marks: -1 })
+  .skip(2)
+  .limit(2);
+
+***Delete the records of students having marks less than 20:
+
+db.Student.deleteMany({ Marks: { $lt: 20 } });
+Delete only the first record from the collection:
+javascript
+Copy code
+db.Student.deleteOne({});

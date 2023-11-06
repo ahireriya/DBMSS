@@ -1,0 +1,122 @@
+// Use your database
+use your_database_name;
+
+// Create the "Book" collection and add data
+db.createCollection("Book");
+
+// Insert sample data into the "Book" collection
+db.Book.insertMany([
+  {
+    Title: "Book 1",
+    Author_name: "Author A",
+    Borrowed_status: "False",
+    price: 250
+  },
+  {
+    Title: "Book 2",
+    Author_name: "Author B",
+    Borrowed_status: "True",
+    price: 350
+  },
+  {
+    Title: "Book 3",
+    Author_name: "Author A",
+    Borrowed_status: "True",
+    price: 400
+  },
+  {
+    Title: "Book 4",
+    Author_name: "Author C",
+    Borrowed_status: "False",
+    price: 280
+  },
+  {
+    Title: "Book 5",
+    Author_name: "Author B",
+    Borrowed_status: "False",
+    price: 450
+  }
+]);
+
+print("Sample data added to the 'Book' collection.");
+
+
+######################################
+
+***Display Author-wise list of books:
+
+// Map function for Task 1
+var mapFunction1 = function() {
+  emit(this.Author_name, { books: [this.Title] });
+};
+
+// Reduce function for Task 1
+var reduceFunction1 = function(key, values) {
+  var reduced = { books: [] };
+  for (var i = 0; i < values.length; i++) {
+    reduced.books = reduced.books.concat(values[i].books);
+  }
+  return reduced;
+};
+
+// Run the MapReduce operation for Task 1
+db.Book.mapReduce(
+  mapFunction1,
+  reduceFunction1,
+  { out: "AuthorWiseBooks" }
+);
+
+
+
+
+***Display Author-wise list of books having Borrowed status as "True":
+
+// Map function for Task 2
+var mapFunction2 = function() {
+  if (this.Borrowed_status === "True") {
+    emit(this.Author_name, { books: [this.Title] });
+  }
+};
+
+// Reduce function for Task 2
+var reduceFunction2 = function(key, values) {
+  var reduced = { books: [] };
+  for (var i = 0; i < values.length; i++) {
+    reduced.books = reduced.books.concat(values[i].books);
+  }
+  return reduced;
+};
+
+// Run the MapReduce operation for Task 2
+db.Book.mapReduce(
+  mapFunction2,
+  reduceFunction2,
+  { out: "AuthorWiseBorrowedBooks" }
+);
+
+
+
+***Display Author-wise list of books having price greater than 300 (assuming a "price" field is present in the collection):
+
+// Map function for Task 3
+var mapFunction3 = function() {
+  if (this.price > 300) {
+    emit(this.Author_name, { books: [this.Title] });
+  }
+};
+
+// Reduce function for Task 3
+var reduceFunction3 = function(key, values) {
+  var reduced = { books: [] };
+  for (var i = 0; i < values.length; i++) {
+    reduced.books = reduced.books.concat(values[i].books);
+  }
+  return reduced;
+};
+
+// Run the MapReduce operation for Task 3
+db.Book.mapReduce(
+  mapFunction3,
+  reduceFunction3,
+  { out: "AuthorWiseExpensiveBooks" }
+);

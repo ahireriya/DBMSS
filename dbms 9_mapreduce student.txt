@@ -1,0 +1,97 @@
+Create collection for Student{roll_no, name, class, dept, aggregate_marks}. Write Map Reduce Functions for following requirements.
+###########################################################
+
+
+// Use your database
+use your_database_name;
+
+// Create the "Student" collection and add data
+db.createCollection("Student");
+
+// Insert sample data into the "Student" collection
+db.Student.insertMany([
+  {
+    roll_no: 1,
+    name: "John",
+    class: "TE",
+    dept: "Computer Science",
+    aggregate_marks: 85
+  },
+  {
+    roll_no: 2,
+    name: "Alice",
+    class: "SE",
+    dept: "Electrical Engineering",
+    aggregate_marks: 92
+  },
+  {
+    roll_no: 3,
+    name: "Bob",
+    class: "BE",
+    dept: "Mechanical Engineering",
+    aggregate_marks: 78
+  },
+  {
+    roll_no: 4,
+    name: "Emma",
+    class: "TE",
+    dept: "Computer Science",
+    aggregate_marks: 90
+  },
+  {
+    roll_no: 5,
+    name: "Michael",
+    class: "SE",
+    dept: "Electrical Engineering",
+    aggregate_marks: 88
+  },
+  {
+    roll_no: 6,
+    name: "Olivia",
+    class: "BE",
+    dept: "Mechanical Engineering",
+    aggregate_marks: 82
+  }
+]);
+
+print("Sample data added to the 'Student' collection.");
+
+
+***Finding the total marks of students of “TE” class department-wise***
+var map = function(){
+  if(this.class='TE'){
+    emit(this.dept,this.marks)
+  }
+};
+var reduce = function(dept,marks){
+  return Array.sum(marks)
+};
+db.Student1.mapReduce(map,reduce,{out:"Result"});
+db.Result.find();
+
+
+***Finding the highest marks of students of “SE” class department-wise***
+var map = function(){
+  if(this.class='SE'){
+    emit(this.dept,this.marks)
+  }
+};
+var reduce = function(dept,marks){
+  return Math.max(marks)
+};
+db.Student1.mapReduce(map,reduce,{out:"Result"});
+db.Result.find();
+
+
+***Find Average marks of students of “BE” class department-wise***
+var mapAverageMarksBE = function() {
+    if (this.class === 'BE') {
+        emit({ dept: this.dept }, this.marks);
+    }
+};
+var reduceAverageMarks = function(dept, marks) {
+    var sum = Array.sum(marks);
+    return sum / marks.length;
+};
+db.Student1.mapReduce(mapAverageMarksBE,reduceAverageMarks,{out:"Result"});
+db.Result.find();

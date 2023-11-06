@@ -1,0 +1,48 @@
+Create the Collection Student_Data( Student _ID, Student _Name, Department, Marks )and solve the
+following:
+
+db.createCollection("Student_data");
+
+db.Student_Data.insertMany([
+  {
+    "Student_ID": 1,
+    "Student_Name": "Alice",
+    "Department": "Computer Science",
+    "Marks": 85
+  },
+  {
+    "Student_ID": 2,
+    "Student_Name": "Bob",
+    "Department": "Mathematics",
+    "Marks": 78
+  },
+  {
+    "Student_ID": 3,
+    "Student_Name": "Carol",
+    "Department": "Computer Science",
+    "Marks": 92
+  },
+  // Add more sample data
+]);
+
+
+***Display all Students based on their departments along with an average Marks of a particular department***
+db.Student_data.aggregate({$group:{_id:"$Department", student:{$push:{_id:"$ID",name:"$Name",marks:"$Marks"}},avgmarks:{$avg:"$Marks"}}});
+
+***Displays the number of Students associated along with a particular department***
+db.Student_data.aggregate({$group:{_id:"$Department", num:{$sum:1}}});
+
+***Display list of Students with the highest Marks in each Department in descending order of Marks***
+db.Student_data.aggregate([{$sort:{Marks:-1,Department:1}},{$group:{_id:"$Department",student:{$first:"$$ROOT"}}}]);
+
+***Create an index on field Student_ID***
+db.Student_data.createIndex({ID:1});
+
+***Create an index on fields “Student_Name‘ and “Department”***
+db.Student_data.createIndex({Name:1,Department:1});
+
+***Drop an index on field Student_ID***
+db.Student_data.dropIndex({ID:1});
+
+***Drop an index on fields “Student_Name‘ and “Department”***
+db.Student_data.dropIndex({Name:1,Department:1});
